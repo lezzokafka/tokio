@@ -29,16 +29,20 @@ use tokio::prelude::*;
 use std::env;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Allow passing an address to listen on as the first argument of this
+    // Allow passing an address (directory) to listen on as the first argument of this
     // program, but otherwise we'll just set up our Unix listener on
-    // 127.0.0.1:8080 for connections.
+    // the directory "/tmp/unix.socket" for connections.
     let addr = env::args().nth(1).unwrap_or("/tmp/unix.socket".to_string());
 
     // Next up we create a Unix listener which will listen for incoming
-    // connections. This Unix listener is bound to the address we determined
+    // connections. This Unix listener is bound to the directory we determined
     // above and must be associated with an event loop, so we pass in a handle
     // to our event loop. After the socket's created we inform that we're ready
     // to go and start accepting connections.
+    // Note that in case of the directory already in use, we can reset it by
+    //
+    //!         rm /tmp/unix.socket
+    //
     let socket = UnixListener::bind(&addr)?;
     println!("Listening on: {}", addr);
 
